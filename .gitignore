@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+/HealthSystem.Web/appsettings.Development.json
+/HealthSystem.Web/appsettings.json
+
 # User-specific files
 *.rsuser
 *.suo

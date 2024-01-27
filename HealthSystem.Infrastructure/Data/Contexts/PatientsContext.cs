@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthSystem.Infrastructure.Data.Contexts
 {
-    public class PostgresDbContext : DbContext
+    public class PatientsContext : DbContext
     {
-        public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options)
+        public PatientsContext(DbContextOptions options) : base(options)
         {
 
         }

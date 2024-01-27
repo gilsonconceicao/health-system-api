@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HealthSystem.Infrastructure\HealthSystem.Infrastructure.csproj" />
+    <ProjectReference Include="..\HealthSystem.Domain\HealthSystem.Domain.csproj" />
   </ItemGroup>
 
 </Project>

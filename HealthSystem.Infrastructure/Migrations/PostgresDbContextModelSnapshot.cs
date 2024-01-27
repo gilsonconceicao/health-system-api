@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace HealthSystem.Infrastructure.Migrations
 {
-    [DbContext(typeof(PostgresDbContext))]
-    partial class PostgresDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PatientsContext))]
+    partial class PatientsContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

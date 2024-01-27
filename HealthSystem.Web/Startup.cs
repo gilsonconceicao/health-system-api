@@ -1,5 +1,8 @@
 using System.Reflection;
+using HealthSystem.Domain.Entities;
+using HealthSystem.Domain.Interfaces;
 using HealthSystem.Infrastructure.Data.Contexts;
+using HealthSystem.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -20,15 +23,19 @@ namespace HealthSystem.Web
         {
             string connectionString = _configuration.GetConnectionString("postgresqlConnection")!;
 
-            services.AddDbContext<PostgresDbContext>((options) => 
+            services.AddDbContext<PatientsContext>((options) =>
             {
                 options.UseLazyLoadingProxies().UseNpgsql(connectionString);
-            }); 
+            });
 
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddScoped<IGenericRepository<Patient>, GenericRepository<Patient>>();
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>

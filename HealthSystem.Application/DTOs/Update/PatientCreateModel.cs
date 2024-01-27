@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-namespace HealthSystem.Application.DTOs.Create
+namespace HealthSystem.Application.DTOs.Update
 {
-    #nullable disable
-    public class PatientCreateModel
+#nullable disable
+    public class PatientUpdateModel
     {
         [Required(ErrorMessage = "Nome é obrigatório")]
         public string Name { get; set; }
@@ -16,6 +16,6 @@ namespace HealthSystem.Application.DTOs.Create
         public bool Smoker { get; set; }
         public bool RegularExercise { get; set; }
         public DateTime BirthDate { get; set; }
-        public AddressCreateModel Address { get; set; }
+        public AddressUpdateModel Address { get; set; }
     }
 }

@@ -1,7 +1,6 @@
-namespace HealthSystem.Domain.Entities
+namespace HealthSystem.Application.DTOs.Create
 {
-#nullable disable
-    public class Patient : Base
+    public class PatientCreateModel
     {
         public string Name { get; set; }
         public string LastName { get; set; }
@@ -11,6 +10,5 @@ namespace HealthSystem.Domain.Entities
         public bool Smoker { get; set; }
         public bool RegularExercise { get; set; }
         public DateTime BirthDate { get; set; }
-        public virtual Address? Address { get; set; }
     }
 }

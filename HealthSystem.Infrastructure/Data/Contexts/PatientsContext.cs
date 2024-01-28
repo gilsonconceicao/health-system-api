@@ -13,6 +13,7 @@ namespace HealthSystem.Infrastructure.Data.Contexts
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Address> Address { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

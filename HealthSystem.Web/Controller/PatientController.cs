@@ -71,7 +71,7 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                Patient patient = await _genericRepository.GetById(Id);
+                Patient patient = await _genericRepository.GetByIdAsync(Id);
                 if (patient == null)
                 {
                     return BadRequest(new
@@ -101,7 +101,7 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                Patient patient = await _genericRepository.GetById(Id);
+                Patient patient = await _genericRepository.GetByIdAsync(Id);
                 if (patient == null)
                 {
                     return BadRequest(new
@@ -129,7 +129,7 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                Patient patient = await _genericRepository.GetById(Id);
+                Patient patient = await _genericRepository.GetByIdAsync(Id);
                 if (patient == null)
                 {
                     return BadRequest(new

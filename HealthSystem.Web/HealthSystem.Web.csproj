@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HealthSystem.Infrastructure\HealthSystem.Infrastructure.csproj" />
     <ProjectReference Include="..\HealthSystem.Domain\HealthSystem.Domain.csproj" />
+    <ProjectReference Include="..\HealthSystem.Application\HealthSystem.Application.csproj" />
   </ItemGroup>
 
 </Project>

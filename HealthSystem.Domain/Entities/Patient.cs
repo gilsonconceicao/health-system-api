@@ -1,6 +1,6 @@
-namespace HealthSystem.Domain.Entities; 
+namespace HealthSystem.Domain.Entities;
 #nullable disable
-    public class Patient : Base
+public class Patient : Base
 {
     public string Name { get; set; }
     public string LastName { get; set; }
@@ -12,5 +12,8 @@ namespace HealthSystem.Domain.Entities;
     public DateTime BirthDate { get; set; }
 #pragma warning disable CS8632
     public virtual Address? Address { get; set; }
+#pragma warning restore CS8632
+#pragma warning disable CS8632
+    public virtual ICollection<Appointment>? Appointments { get; set; } = new List<Appointment>();
 #pragma warning restore CS8632
 }

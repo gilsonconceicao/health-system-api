@@ -11,5 +11,10 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
             .HasOne(p => p.Address)
             .WithOne(a => a.Patient)
             .HasForeignKey<Address>(a => a.PatientId);
+        
+        builder
+            .HasMany(p => p.Appointments)
+            .WithOne(a => a.Patient)
+            .HasForeignKey(a => a.PatientId);
     }
 }

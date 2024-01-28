@@ -19,7 +19,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : Base
         return await _patientsContext.Set<T>().ToListAsync(); 
     }
 
-    public async Task<T> GetById(Guid Id)
+    public async Task<T> GetByIdAsync(Guid Id)
     {
         return await _patientsContext.Set<T>().FirstOrDefaultAsync(p => p.Id == Id);
     }

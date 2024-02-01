@@ -27,14 +27,4 @@ public class AppointmentRepository : IAppointmentRepository
         await _patientsContext.Set<Appointment>().AddAsync(Appointment);
         await _patientsContext.SaveChangesAsync();
     }
-
-    public async Task<bool> CheckExistsAppointmentByPatientIdAsync(Guid PatientId)
-    {
-        var query = await _patientsContext.Set<Appointment>().FirstOrDefaultAsync(
-            consult => consult.PatientId == PatientId
-        ); 
-
-        return await Task.FromResult(query != null);
-    }
-
 }

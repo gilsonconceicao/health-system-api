@@ -6,6 +6,8 @@ public class PatientReadModel
 #nullable disable
 {
     public Guid Id { get; set; }
+    public DateTime CreatedAt { get; set; }
+
     public string Name { get; set; }
     public string LastName { get; set; }
     public string Gender { get; set; }

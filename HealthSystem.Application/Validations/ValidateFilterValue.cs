@@ -2,21 +2,12 @@ namespace HealthSystem.Application.Validations;
 #nullable disable
 public class ValidateFilterValue<T>
 {
-    private DateTime? birthDate;
-
-
     public T Value { get; set; }
 
     public ValidateFilterValue(T valueFilter)
     {
         Value = valueFilter;
     }
-
-    public ValidateFilterValue(DateTime? birthDate)
-    {
-        this.birthDate = birthDate;
-    }
-
 
     public bool IsValidField()
     {

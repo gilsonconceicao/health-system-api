@@ -10,6 +10,8 @@ namespace HealthSystem.Application.Mappers
         {
             CreateMap<Appointment, AppointmentCreateModel>()
                 .ReverseMap();
+            CreateMap<Appointment, AppointmentReadModel>()
+                .ReverseMap();
         }
     }
 }

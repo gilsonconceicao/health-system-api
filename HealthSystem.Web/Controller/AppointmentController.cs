@@ -73,7 +73,7 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-                // await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
+                await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
             }
             catch (Exception ex)

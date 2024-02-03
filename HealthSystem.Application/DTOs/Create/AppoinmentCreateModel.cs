@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using HealthSystem.Application.DTOs.Enums;
 using HealthSystem.Application.DTOs.Update;
 
 namespace HealthSystem.Application.DTOs.Create

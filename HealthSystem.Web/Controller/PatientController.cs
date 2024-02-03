@@ -1,13 +1,15 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
+using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Application.DTOs.Update;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
 using HealthSystem.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc; 
 
 namespace HealthSystem.Web.Controller
 {
+    #nullable disable
     [ApiController]
     [Route("[Controller]")]
     public class PatientController : ControllerBase
@@ -28,11 +30,24 @@ namespace HealthSystem.Web.Controller
         /// <response code="200">Returns 200</response>
         /// <response code="400">Returns 400 if the query is invalid</response>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(
+            [FromQuery(Name = "page")] int page = 0,
+            [FromQuery(Name = "size")] int size = 5,
+            [FromQuery(Name = "Nome")] string Name = null,
+            [FromQuery(Name = "Email")] string Email = null, 
+            [FromQuery(Name = "Data de nascimento")] DateTime? BirthDate = null
+        )
         {
             try
             {
-                return Ok(await _genericRepository.GetAll());
+                List<PatientReadModel> listWithFilters = await _patientRepository.GetAllPatiets( 
+                    page, 
+                    size, 
+                    Name, 
+                    Email, 
+                    BirthDate
+                ); 
+                return Ok(listWithFilters);
             }
             catch (Exception ex)
             {

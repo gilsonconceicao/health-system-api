@@ -1,5 +1,6 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
+using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Domain.Entities;
 
 namespace HealthSystem.Application.Mappers
@@ -9,6 +10,7 @@ namespace HealthSystem.Application.Mappers
         public PatientProfile()
         {
             CreateMap<Patient, PatientCreateModel>().ReverseMap();
+            CreateMap<PatientReadModel, Patient>().ReverseMap();
         }
     }
 }

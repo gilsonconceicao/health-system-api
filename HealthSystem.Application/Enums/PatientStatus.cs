@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace HealthSystem.Application.DTOs.Update;
+namespace HealthSystem.Application.DTOs.Enums;
 #nullable disable
 public enum PatientStatus
 {

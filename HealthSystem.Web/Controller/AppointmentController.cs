@@ -58,7 +58,6 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-
                 var validateAppointmentDate = listAppointment.Where((x) =>
                 {
                     return x.AppointmentDate.ToString() == model.AppointmentDate.ToString();
@@ -75,6 +74,26 @@ namespace HealthSystem.Web.Controller
 
                 await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Lista todas as consultas cadastradas
+        /// </summary>
+        /// <returns>Obtem uma lista de consultas</returns>
+        /// <response code="200">200 Retorno dos dados com sucesso</response>
+        /// <response code="400">400 se houver falha na requisição</response>
+        [HttpGet]
+        public async Task<IActionResult> GetAllAppointmentsAsync()
+        {
+            try
+            {
+                List<AppointmentReadModel> query = await _AppointmentRepository.GetAllAppointments();
+                return Ok(query);
             }
             catch (Exception ex)
             {

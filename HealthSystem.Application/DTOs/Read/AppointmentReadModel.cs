@@ -10,7 +10,7 @@ public class AppointmentReadModel
     public string Reason { get; set; }
     public string FeedbackPatient { get; set; }
     public PatientStatus Status { get; set; }
+    public string StatusDisplay { get; set; }
     public DateTime AppointmentDate { get; set; }
-    public virtual PatientReadModel Patient { get; set; }
     public Guid PatientId { get; set; }
 }

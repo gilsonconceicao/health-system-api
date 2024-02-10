@@ -11,6 +11,7 @@ public class AppointmentReadModel
     public string FeedbackPatient { get; set; }
     public PatientStatus Status { get; set; }
     public string StatusDisplay { get; set; }
+    public bool IsCanceled { get; set; }
     public DateTime AppointmentDate { get; set; }
     public Guid PatientId { get; set; }
 }

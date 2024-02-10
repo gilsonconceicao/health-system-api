@@ -25,7 +25,7 @@ namespace HealthSystem.Web.Controller
         }
 
         /// <summary>
-        /// Agenda uma nova consulta por tomador
+        /// Agendar nova consulta
         /// </summary>
         /// <returns>Realiza o agendamento de uma consulta</returns>
         /// <response code="200">200 Para sucesso ao realizat consulta</response>
@@ -75,6 +75,37 @@ namespace HealthSystem.Web.Controller
 
                 await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Cancelar consulta
+        /// </summary>
+        /// <returns>Obtem uma lista de consultas</returns>
+        /// <response code="200">200 Retorno dos dados com sucesso</response>
+        /// <response code="400">400 se houver falha na requisição</response>
+        [HttpPut("{Id}/Cancel")]
+        public async Task<IActionResult> CancelAppointmentsAsync(Guid Id)
+        {
+            try
+            {
+                Appointment findAppointment = await _AppointmentRepository.GetAppointmentById(Id);
+
+                if (findAppointment == null)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Consulta não encontrada ou não existe",
+                        Id
+                    });
+                }
+
+                await _AppointmentRepository.CancelAppointmentAsync(findAppointment);
+                return NoContent();
             }
             catch (Exception ex)
             {

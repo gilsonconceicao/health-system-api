@@ -19,6 +19,7 @@ namespace HealthSystem.Infrastructure.Data.Contexts
         {
             modelBuilder.ApplyConfiguration(new PatientConfiguration());
             modelBuilder.ApplyConfiguration(new AddressConfiguration());
+            modelBuilder.ApplyConfiguration(new AppointmentConfiguration());
             base.OnModelCreating(modelBuilder);
         }
     }

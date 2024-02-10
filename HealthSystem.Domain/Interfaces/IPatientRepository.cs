@@ -6,7 +6,7 @@ using HealthSystem.Domain.Entities;
 namespace HealthSystem.Domain.Interfaces;
 public interface IPatientRepository
 {
-    Task<List<PatientReadModel>> GetAllPatiets(
+    Task<PaginationList<List<PatientReadModel>>> GetAllPatiets(
         int Page, 
         int Size, 
         string Name, 

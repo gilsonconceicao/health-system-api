@@ -1,5 +1,6 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
+using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Domain.Interfaces;
 using HealthSystem.Infrastructure.Data.Contexts;
@@ -27,12 +28,15 @@ public class AppointmentRepository : IAppointmentRepository
         await _patientsContext.SaveChangesAsync();
     }
 
-    public async Task<List<AppointmentReadModel>> GetAllAppointments()
+    public async Task<PaginationList<List<AppointmentReadModel>>> GetAllAppointments()
     {
         List<Appointment> appointments = await _patientsContext.Appointments.ToListAsync();
         var query = _mapper.Map<List<AppointmentReadModel>>(appointments);
 
-        return query; 
+        return new PaginationList<List<AppointmentReadModel>>() {
+            Data = query, 
+            TotalItems = query.Count
+        }; 
     }
 
 }

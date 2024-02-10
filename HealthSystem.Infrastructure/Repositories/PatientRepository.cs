@@ -29,8 +29,8 @@ public class PatientRepository : IPatientRepository
         _patientsContext.SaveChanges();
     }
 
-    public async Task<List<PatientReadModel>> GetAllPatiets(
-        int Page = 0,
+    public async Task<PaginationList<List<PatientReadModel>>>  GetAllPatiets(
+        int Page = 1,
         int Size = 5,
         string Name = null,
         string Email = null,
@@ -53,7 +53,7 @@ public class PatientRepository : IPatientRepository
             queryData = queryData.Where(p => p.Email.ToLower().Contains(Email.ToLower())).ToList();
         };
 
-        if (BirthDate != null &&new ValidateFilterValue<string>(BirthDate.ToString()).IsValidField())
+        if (BirthDate != null && new ValidateFilterValue<string>(BirthDate.ToString()).IsValidField())
         {
             queryData = queryData.Where(p => 
             {
@@ -64,7 +64,10 @@ public class PatientRepository : IPatientRepository
             }).ToList();
         };
 
-        return queryData;
+        return new PaginationList<List<PatientReadModel>>() {
+            Data = queryData, 
+            TotalItems = queryData.Count
+        };
     }
 
 

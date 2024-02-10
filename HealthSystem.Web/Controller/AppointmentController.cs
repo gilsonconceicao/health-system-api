@@ -1,5 +1,6 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
+using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
 using HealthSystem.Infrastructure.Repositories;
@@ -92,7 +93,7 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                List<AppointmentReadModel> query = await _AppointmentRepository.GetAllAppointments();
+                PaginationList<List<AppointmentReadModel>> query = await _AppointmentRepository.GetAllAppointments();
                 return Ok(query);
             }
             catch (Exception ex)

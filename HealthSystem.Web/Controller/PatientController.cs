@@ -40,7 +40,7 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                List<PatientReadModel> listWithFilters = await _patientRepository.GetAllPatiets( 
+                PaginationList<List<PatientReadModel>> listWithFilters = await _patientRepository.GetAllPatiets( 
                     page, 
                     size, 
                     Name, 

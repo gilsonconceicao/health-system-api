@@ -36,7 +36,8 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Patient patient = await _genericRepositoryPatient.GetByIdAsync(PatientId);
-                var listAppointment = await _genericRepository.GetAll();
+                var appointments = await _genericRepository.GetAll();
+                var listAppointment = appointments.Where(x => x.IsCanceled == false); 
 
 
                 if (patient == null)
@@ -50,7 +51,7 @@ namespace HealthSystem.Web.Controller
 
                 var countAppointmentByPatientId = listAppointment.Where((appointment) => appointment.PatientId == patient.Id);
 
-                if (countAppointmentByPatientId.Count() > 3)
+                if (countAppointmentByPatientId.Count() >= 3)
                 {
                     return BadRequest(new
                     {
@@ -72,8 +73,7 @@ namespace HealthSystem.Web.Controller
                         AppointmentDate = model.AppointmentDate
                     });
                 }
-
-                await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
+                // await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
             }
             catch (Exception ex)

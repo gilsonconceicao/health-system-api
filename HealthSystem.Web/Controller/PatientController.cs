@@ -56,7 +56,7 @@ namespace HealthSystem.Web.Controller
         }
 
         /// <summary>
-        /// Adiciona um novo paciente
+        /// Adiciona um novo paciente+
         /// </summary>
         /// <returns>Adição de paciente</returns>
         /// <response code="201">Retorna 200 registro criado com sucesso</response>

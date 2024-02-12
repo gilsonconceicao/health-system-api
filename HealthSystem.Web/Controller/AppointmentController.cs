@@ -28,9 +28,10 @@ namespace HealthSystem.Web.Controller
         /// <summary>
         /// Agendar nova consulta
         /// </summary>
-        /// <returns>Realiza o agendamento de uma consulta</returns>
-        /// <response code="200">200 Para sucesso ao realizat consulta</response>
+        /// <returns>Agendar consulta</returns>
+        /// <response code="200">200 Para sucesso ao agendar consulta</response>
         /// <response code="400">400 se houver falha na requisição</response>
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AppointmentCreateModel))]
         [HttpPost("{PatientId}")]
         public async Task<IActionResult> CreateAppointmentAsync(Guid PatientId, [FromBody] AppointmentCreateModel model)
         {
@@ -74,7 +75,7 @@ namespace HealthSystem.Web.Controller
                         AppointmentDate = model.AppointmentDate
                     });
                 }
-                // await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
+                await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
             }
             catch (Exception ex)
@@ -90,6 +91,7 @@ namespace HealthSystem.Web.Controller
         /// <response code="204">204 Consulta cancelada com sucesso</response>
         /// <response code="200">200 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpPut("{Id}/Cancel")]
         public async Task<IActionResult> CancelAppointmentsAsync(Guid Id)
         {
@@ -131,6 +133,7 @@ namespace HealthSystem.Web.Controller
         /// <returns>Adiciona um feedback/comentário</returns>
         /// <response code="200">200 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
+         [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(string))]
         [HttpPost("{Id}/Feedback")]
         public async Task<IActionResult> AddFeedbackAsync(Guid Id, [FromBody] string FeedbackMessage)
         {
@@ -171,6 +174,7 @@ namespace HealthSystem.Web.Controller
         /// <returns>Obtem uma lista de consultas</returns>
         /// <response code="200">200 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginationList<List<AppointmentReadModel>>))]
         [HttpGet]
         public async Task<IActionResult> GetAllAppointmentsAsync()
         {
@@ -191,6 +195,7 @@ namespace HealthSystem.Web.Controller
         /// <returns>Remove uma consulta pelo seu identificador</returns>
         /// <response code="204">204 Retorno com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpDelete("{Id}")]
         public async Task<IActionResult> DeleteAppintmentByIdAsync(Guid Id)
         {

@@ -57,7 +57,7 @@ public class AppointmentRepository : IAppointmentRepository
     {
         if (Appointment.FeedbackPatient.Trim().Length > 0)
         {
-            Appointment.IsEdited = true;
+            // Appointment.IsEdited = true;
         }
 
         Appointment.FeedbackPatient = FeedbackMessage;

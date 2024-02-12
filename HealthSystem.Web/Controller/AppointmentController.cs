@@ -184,5 +184,36 @@ namespace HealthSystem.Web.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Remove um consulta por id
+        /// </summary>
+        /// <returns>Remove uma consulta pelo seu identificador</returns>
+        /// <response code="204">204 Retorno com sucesso</response>
+        /// <response code="400">400 se houver falha na requisição</response>
+        [HttpDelete("{Id}")]
+        public async Task<IActionResult> DeleteAppintmentByIdAsync(Guid Id)
+        {
+            try
+            {
+                Appointment findAppointment = await _genericRepository.GetByIdAsync(Id);
+
+                if (findAppointment == null)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Consulta não encontrada ou não existe",
+                        Id
+                    });
+                }
+
+                await _genericRepository.Delete(findAppointment);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

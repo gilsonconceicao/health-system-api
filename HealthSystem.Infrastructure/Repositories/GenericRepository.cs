@@ -34,8 +34,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : Base
         throw new NotImplementedException();
     }
 
-    public void Delete(T entity)
+    public async Task Delete(T entity)
     {
         _patientsContext.Set<T>().Remove(entity); 
+        await _patientsContext.SaveChangesAsync();
     }
 }

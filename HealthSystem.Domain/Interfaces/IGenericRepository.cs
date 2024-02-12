@@ -7,6 +7,6 @@ public interface IGenericRepository<T> where T : Base
         Task<List<T>> GetAll();
         Task<T> GetByIdAsync(Guid id);
         void Insert(T obj);
-        void Delete(T entity);
+        Task Delete(T entity);
         void Save();
     }

@@ -14,9 +14,11 @@ public class AppointmentRepository : IAppointmentRepository
     private readonly PatientsContext _patientsContext;
     private readonly IMapper _mapper;
 
-    public AppointmentRepository(PatientsContext patientsContext, IMapper mapper)
+    public AppointmentRepository(PatientsContext patientsContext,
+        IMapper mapper)
     {
         _patientsContext = patientsContext;
+   
         _mapper = mapper;
     }
 

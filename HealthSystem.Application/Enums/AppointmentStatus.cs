@@ -9,10 +9,6 @@ public enum AppointmentStatus
     Scheduled = 0,
     [Description("Cancelada")]
     Cancelled = 1,
-    [Description("Pendente")]
-    Pending = 2,
-    [Description("Realizada")]
-    Realize = 3,
     [Description("Concluída")]
-    Completed = 4,
+    Completed = 2,
 }

@@ -1,5 +1,6 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
+using HealthSystem.Application.DTOs.Enums;
 using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
@@ -37,7 +38,7 @@ namespace HealthSystem.Web.Controller
             {
                 Patient patient = await _genericRepositoryPatient.GetByIdAsync(PatientId);
                 var appointments = await _genericRepository.GetAll();
-                var listAppointment = appointments.Where(x => x.IsCanceled == false); 
+                var listAppointment = appointments.Where(x => x.IsCanceled == false);
 
 
                 if (patient == null)
@@ -85,7 +86,8 @@ namespace HealthSystem.Web.Controller
         /// <summary>
         /// Cancelar consulta
         /// </summary>
-        /// <returns>Obtem uma lista de consultas</returns>
+        /// <returns>Cancela uma consulta </returns>
+        /// <response code="204">204 Consulta cancelada com sucesso</response>
         /// <response code="200">200 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
         [HttpPut("{Id}/Cancel")]
@@ -104,7 +106,57 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
+                if (findAppointment.Status == PatientStatus.Cancelled)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Não é possível cancelar uma consulta que já se encontra cancelada",
+                        Id
+                    });
+                }
+
+
                 await _AppointmentRepository.CancelAppointmentAsync(findAppointment);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Adicionar ou edita um feedback à consulta
+        /// </summary>
+        /// <returns>Adiciona um feedback/comentário</returns>
+        /// <response code="200">200 Retorno dos dados com sucesso</response>
+        /// <response code="400">400 se houver falha na requisição</response>
+        [HttpPost("{Id}/Feedback")]
+        public async Task<IActionResult> AddFeedbackAsync(Guid Id, [FromBody] string FeedbackMessage)
+        {
+            try
+            {
+                Appointment findAppointment = await _AppointmentRepository.GetAppointmentById(Id);
+
+                if (findAppointment == null)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Consulta não encontrada ou não existe",
+                        Id
+                    });
+                }
+
+                if (findAppointment.Status != PatientStatus.Completed)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
+                        Id,
+                        details = $"CurrentStatus: {findAppointment.Status}, expected: {PatientStatus.Completed}"
+                    });
+                }
+                await _AppointmentRepository.AddFeedbackByIdAsync(findAppointment, FeedbackMessage);
                 return NoContent();
             }
             catch (Exception ex)

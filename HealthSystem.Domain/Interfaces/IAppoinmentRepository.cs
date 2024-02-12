@@ -8,5 +8,6 @@ public interface IAppointmentRepository
     Task<PaginationList<List<AppointmentReadModel>>> GetAllAppointments();
     Task AddAppointmentAsync(AppointmentCreateModel Model, Guid PatientId);
     Task CancelAppointmentAsync(Appointment Appointment);
+    Task AddFeedbackByIdAsync(Appointment Appointment, string Feedback);
     Task<Appointment> GetAppointmentById(Guid Id);
 }

@@ -49,6 +49,16 @@ public class AppointmentRepository : IAppointmentRepository
         await _patientsContext.SaveChangesAsync();
     }
 
-    public async Task<Appointment> GetAppointmentById(Guid Id) => await _patientsContext.Appointments.FirstOrDefaultAsync(x => x.Id == Id); 
+    public async Task<Appointment> GetAppointmentById(Guid Id) => await _patientsContext.Appointments.FirstOrDefaultAsync(x => x.Id == Id);
 
+    public async Task AddFeedbackByIdAsync(Appointment Appointment, string FeedbackMessage)
+    {
+        if (Appointment.FeedbackPatient.Trim().Length > 0)
+        {
+            Appointment.IsEdited = true;
+        }
+
+        Appointment.FeedbackPatient = FeedbackMessage;
+        await _patientsContext.SaveChangesAsync();
+    }
 }

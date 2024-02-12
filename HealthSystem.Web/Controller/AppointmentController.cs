@@ -106,7 +106,7 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-                if (findAppointment.Status == PatientStatus.Cancelled)
+                if (findAppointment.Status == AppointmentStatus.Cancelled)
                 {
                     return BadRequest(new
                     {
@@ -147,13 +147,13 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-                if (findAppointment.Status != PatientStatus.Completed)
+                if (findAppointment.Status != AppointmentStatus.Completed)
                 {
                     return BadRequest(new
                     {
                         message = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
                         Id,
-                        details = $"CurrentStatus: {findAppointment.Status}, expected: {PatientStatus.Completed}"
+                        details = $"CurrentStatus: {findAppointment.Status}, expected: {AppointmentStatus.Completed}"
                     });
                 }
                 await _AppointmentRepository.AddFeedbackByIdAsync(findAppointment, FeedbackMessage);

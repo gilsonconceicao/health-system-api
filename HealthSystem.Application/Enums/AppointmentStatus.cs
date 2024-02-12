@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HealthSystem.Application.DTOs.Enums;
 #nullable disable
-public enum PatientStatus
+public enum AppointmentStatus
 {
     [Description("Agendado")]
     Scheduled = 0,

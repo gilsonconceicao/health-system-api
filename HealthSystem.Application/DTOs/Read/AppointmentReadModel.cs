@@ -9,7 +9,7 @@ public class AppointmentReadModel
     public Guid Id { get; set; }
     public string Reason { get; set; }
     public string FeedbackPatient { get; set; }
-    public PatientStatus Status { get; set; }
+    public AppointmentStatus Status { get; set; }
     public string StatusDisplay { get; set; }
     public bool IsCanceled { get; set; }
     public DateTime AppointmentDate { get; set; }

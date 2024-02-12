@@ -8,7 +8,7 @@ public class Appointment : Base
     public string FeedbackPatient { get; set; }
     public bool IsCanceled { get; set; }
     public bool IsEdited { get; set; }
-    public PatientStatus Status { get; set; }
+    public AppointmentStatus Status { get; set; }
     public DateTime AppointmentDate { get; set; }
     public virtual Patient Patient { get; set; }
     public Guid PatientId { get; set; }

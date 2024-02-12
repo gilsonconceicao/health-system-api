@@ -44,7 +44,7 @@ public class AppointmentRepository : IAppointmentRepository
     public async Task CancelAppointmentAsync(Appointment Appointment)
     {
         Appointment.IsCanceled = true;
-        Appointment.Status = PatientStatus.Cancelled;
+        Appointment.Status = AppointmentStatus.Cancelled;
 
         await _patientsContext.SaveChangesAsync();
     }

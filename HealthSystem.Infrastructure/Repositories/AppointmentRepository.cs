@@ -18,7 +18,7 @@ public class AppointmentRepository : IAppointmentRepository
         IMapper mapper)
     {
         _patientsContext = patientsContext;
-   
+
         _mapper = mapper;
     }
 
@@ -63,4 +63,17 @@ public class AppointmentRepository : IAppointmentRepository
         Appointment.FeedbackPatient = FeedbackMessage;
         await _patientsContext.SaveChangesAsync();
     }
+
+    public async Task ConfirmParticipationAsync(Appointment Appointment)
+    {
+        Appointment.Status = AppointmentStatus.confirmParticipation;
+        await _patientsContext.SaveChangesAsync();
+    }
+
+    public async Task CompletedAppointmentAsync(Appointment Appointment)
+    {
+        Appointment.Status = AppointmentStatus.Completed;
+        await _patientsContext.SaveChangesAsync();
+    }
+
 }

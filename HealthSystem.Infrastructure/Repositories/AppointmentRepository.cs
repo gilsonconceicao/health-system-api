@@ -57,7 +57,7 @@ public class AppointmentRepository : IAppointmentRepository
     {
         if (Appointment.FeedbackPatient.Trim().Length > 0)
         {
-            // Appointment.IsEdited = true;
+            Appointment.UpdatedAt = DateTime.UtcNow;
         }
 
         Appointment.FeedbackPatient = FeedbackMessage;

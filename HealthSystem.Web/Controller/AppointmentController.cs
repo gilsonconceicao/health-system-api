@@ -97,9 +97,9 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                Appointment findAppointment = await _AppointmentRepository.GetAppointmentById(Id);
+                Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (findAppointment == null)
+                if (appointment == null)
                 {
                     return BadRequest(new
                     {
@@ -108,7 +108,7 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-                if (findAppointment.Status == AppointmentStatus.Cancelled)
+                if (appointment.Status == AppointmentStatus.Cancelled)
                 {
                     return BadRequest(new
                     {
@@ -118,7 +118,7 @@ namespace HealthSystem.Web.Controller
                 }
 
 
-                await _AppointmentRepository.CancelAppointmentAsync(findAppointment);
+                await _AppointmentRepository.CancelAppointmentAsync(appointment);
                 return NoContent();
             }
             catch (Exception ex)
@@ -133,15 +133,15 @@ namespace HealthSystem.Web.Controller
         /// <returns>Adiciona um feedback/comentário</returns>
         /// <response code="200">200 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
-         [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(string))]
         [HttpPost("{Id}/Feedback")]
         public async Task<IActionResult> AddFeedbackAsync(Guid Id, [FromBody] string FeedbackMessage)
         {
             try
             {
-                Appointment findAppointment = await _AppointmentRepository.GetAppointmentById(Id);
+                Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (findAppointment == null)
+                if (appointment == null)
                 {
                     return BadRequest(new
                     {
@@ -150,16 +150,16 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-                if (findAppointment.Status != AppointmentStatus.Completed)
+                if (appointment.Status != AppointmentStatus.Completed)
                 {
                     return BadRequest(new
                     {
                         message = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
                         Id,
-                        details = $"CurrentStatus: {findAppointment.Status}, expected: {AppointmentStatus.Completed}"
+                        details = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
                     });
                 }
-                await _AppointmentRepository.AddFeedbackByIdAsync(findAppointment, FeedbackMessage);
+                await _AppointmentRepository.AddFeedbackByIdAsync(appointment, FeedbackMessage);
                 return NoContent();
             }
             catch (Exception ex)
@@ -190,6 +190,51 @@ namespace HealthSystem.Web.Controller
         }
 
         /// <summary>
+        /// Confirmar presença
+        /// </summary>
+        /// <returns>Confirmar presença pendente</returns>
+        /// <response code="204">204 Retorno dos dados com sucesso</response>
+        /// <response code="400">400 se houver falha na requisição</response>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPut("{Id}/confirmParticipation")]
+        public async Task<IActionResult> ConfirmPresenceAppointmentAsync(Guid Id)
+        {
+            try
+            {
+                Appointment appointment = await _genericRepository.GetByIdAsync(Id);
+
+                if (appointment == null)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Consulta não encontrada ou não existe",
+                        Id
+                    });
+                }
+                else
+                {
+                    var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
+                    var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
+                    if ((sameMonth && sameYear) && DateTime.Now.Day == appointment.AppointmentDate.Day)
+                    {
+                        return BadRequest(new
+                        {
+                            message = "Não é possível confirmar presença no mesmo dia no qual foi agendado",
+                            Id,
+                            AppointmentDat = appointment.AppointmentDate
+                        });
+                    }
+                }
+                await _AppointmentRepository.ConfirmParticipationAsync(appointment);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Remove um consulta por id
         /// </summary>
         /// <returns>Remove uma consulta pelo seu identificador</returns>
@@ -201,9 +246,9 @@ namespace HealthSystem.Web.Controller
         {
             try
             {
-                Appointment findAppointment = await _genericRepository.GetByIdAsync(Id);
+                Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (findAppointment == null)
+                if (appointment == null)
                 {
                     return BadRequest(new
                     {
@@ -212,7 +257,51 @@ namespace HealthSystem.Web.Controller
                     });
                 }
 
-                await _genericRepository.Delete(findAppointment);
+                await _genericRepository.Delete(appointment);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+         /// <summary>
+        /// Finalizar consulta
+        /// </summary>
+        /// <returns>Marcar como concluída a consulta</returns>
+        /// <response code="204">204 Retorno com sucesso</response>
+        /// <response code="400">400 se houver falha na requisição</response>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPut("{Id}/Completed")]
+        public async Task<IActionResult> CompletedAppintmentByIdAsync(Guid Id)
+        {
+            try
+            {
+                Appointment appointment = await _genericRepository.GetByIdAsync(Id);
+
+                if (appointment == null)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Consulta não encontrada ou não existe",
+                        Id
+                    });
+                } else
+                {
+                    var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
+                    var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
+                    if ((sameMonth && sameYear) && appointment.AppointmentDate.Day +1 <= DateTime.Now.Day)
+                    {
+                        return BadRequest(new
+                        {
+                            message = "Só pode confirmar uma consulta um dia após ser realizada",
+                            Id,
+                            AppointmentDat = appointment.AppointmentDate
+                        });
+                    }
+                }
+                await _AppointmentRepository.CompletedAppointmentAsync(appointment);
                 return NoContent();
             }
             catch (Exception ex)

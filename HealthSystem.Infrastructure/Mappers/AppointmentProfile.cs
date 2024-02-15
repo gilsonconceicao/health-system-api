@@ -1,5 +1,6 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
+using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Application.Services;
 using HealthSystem.Domain.Entities;
 
@@ -10,6 +11,8 @@ namespace HealthSystem.Application.Mappers
         public AppointmentProfile()
         {
             CreateMap<Appointment, AppointmentCreateModel>()
+                .ReverseMap();
+            CreateMap<Appointment, DashboardAppointmentReadModel>()
                 .ReverseMap();
             CreateMap<Appointment, AppointmentReadModel>()
                 .ForMember(

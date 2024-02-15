@@ -36,6 +36,10 @@ namespace HealthSystem.Web
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IGenericRepository<Patient>, GenericRepository<Patient>>();
+            services.AddScoped<IGenericRepository<Appointment>, GenericRepository<Appointment>>();
+            services.AddScoped<IPatientRepository, PatientRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<DashboardRepository>();
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>

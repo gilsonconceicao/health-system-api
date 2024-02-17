@@ -78,6 +78,12 @@ namespace HealthSystem.Web
                 opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Sistema de saúde V1");
             });
 
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

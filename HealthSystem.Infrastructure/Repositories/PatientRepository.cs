@@ -29,7 +29,7 @@ public class PatientRepository : IPatientRepository
         _patientsContext.SaveChanges();
     }
 
-    public async Task<PaginationList<List<PatientReadModel>>>  GetAllPatiets(
+    public async Task<PaginationList<List<PatientReadModel>>> GetAllPatiets(
         int Page = 1,
         int Size = 5,
         string Name = null,
@@ -55,17 +55,18 @@ public class PatientRepository : IPatientRepository
 
         if (BirthDate != null && new ValidateFilterValue<string>(BirthDate.ToString()).IsValidField())
         {
-            queryData = queryData.Where(p => 
+            queryData = queryData.Where(p =>
             {
-                string format = "dd/MM/yyyy"; 
-                var currentValue = p.BirthDate.ToString(format); 
-                var birthDate = BirthDate.GetValueOrDefault().ToString(format);  
+                string format = "dd/MM/yyyy";
+                var currentValue = p.BirthDate.ToString(format);
+                var birthDate = BirthDate.GetValueOrDefault().ToString(format);
                 return currentValue.Contains(birthDate);
             }).ToList();
         };
 
-        return new PaginationList<List<PatientReadModel>>() {
-            Data = queryData, 
+        return new PaginationList<List<PatientReadModel>>()
+        {
+            Data = queryData,
             TotalItems = queryData.Count
         };
     }
@@ -90,6 +91,7 @@ public class PatientRepository : IPatientRepository
         currentEntity.RegularExercise = updatedEntity.RegularExercise;
         currentEntity.Smoker = updatedEntity.Smoker;
 
+        _patientsContext.Patients.Update(currentEntity);
         await _patientsContext.SaveChangesAsync();
     }
 

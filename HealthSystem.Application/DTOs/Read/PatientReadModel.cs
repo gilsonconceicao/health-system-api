@@ -16,6 +16,7 @@ public class PatientReadModel
     public bool Smoker { get; set; }
     public bool RegularExercise { get; set; }
     public DateTime BirthDate { get; set; }
+    public string BirthDateDisplay { get; set; }
     public virtual AddressReadModel Address { get; set; }
     public virtual ICollection<AppointmentReadModel>? Appointments { get; set; } = new List<AppointmentReadModel>();
 }

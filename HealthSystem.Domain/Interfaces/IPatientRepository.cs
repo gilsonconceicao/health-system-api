@@ -14,5 +14,5 @@ public interface IPatientRepository
         DateTime? BirthDate
     );
     Task AddPatientAsync(PatientCreateModel model); 
-    void UpdatePatientAsync(Patient current, PatientUpdateModel model); 
+    Task UpdatePatientAsync(Patient current, PatientUpdateModel model); 
 }

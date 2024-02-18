@@ -10,7 +10,12 @@ namespace HealthSystem.Application.Mappers
         public PatientProfile()
         {
             CreateMap<Patient, PatientCreateModel>().ReverseMap();
-            CreateMap<PatientReadModel, Patient>().ReverseMap();
+            CreateMap<Patient, PatientReadModel>()
+                .ForMember(
+                    dst => dst.BirthDateDisplay, 
+                    src => src.MapFrom(value => value.BirthDate.ToString())
+                )
+                .ReverseMap();
         }
     }
 }

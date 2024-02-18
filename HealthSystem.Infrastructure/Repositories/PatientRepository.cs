@@ -72,7 +72,7 @@ public class PatientRepository : IPatientRepository
     }
 
 
-    public async void UpdatePatientAsync(Patient currentEntity, PatientUpdateModel updatedEntity)
+    public async Task UpdatePatientAsync(Patient currentEntity, PatientUpdateModel updatedEntity)
     {
         if (currentEntity.Address != null)
         {

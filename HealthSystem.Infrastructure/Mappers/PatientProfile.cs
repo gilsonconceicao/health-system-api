@@ -12,8 +12,8 @@ namespace HealthSystem.Application.Mappers
             CreateMap<Patient, PatientCreateModel>().ReverseMap();
             CreateMap<Patient, PatientReadModel>()
                 .ForMember(
-                    dst => dst.BirthDateDisplay, 
-                    src => src.MapFrom(value => value.BirthDate.ToString())
+                    dest => dest.BirthDateDisplay, 
+                    src => src.MapFrom(value => value.BirthDate.ToString("dd/MM/yyyy"))
                 )
                 .ReverseMap();
         }

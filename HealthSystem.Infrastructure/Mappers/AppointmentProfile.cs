@@ -16,8 +16,13 @@ namespace HealthSystem.Application.Mappers
                 .ReverseMap();
             CreateMap<Appointment, AppointmentReadModel>()
                 .ForMember(
-                    dst => dst.StatusDisplay,
-                    map => map.MapFrom(data => data.Status.GetDescription()))
+                    dest => dest.StatusDisplay,
+                    map => map.MapFrom(data => data.Status.GetDescription())
+                )
+                .ForMember(
+                    dest => dest.AppointmentDateDisplay,
+                    map => map.MapFrom(item => item.AppointmentDate.ToString("dd/MM/yyyy"))
+                )
                 .ReverseMap();
         }
     }

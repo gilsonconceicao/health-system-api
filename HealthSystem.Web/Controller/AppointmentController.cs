@@ -196,7 +196,7 @@ namespace HealthSystem.Web.Controller
         /// <response code="204">204 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [HttpPut("{Id}/confirmParticipation")]
+        [HttpPut("{Id}/ConfirmParticipation")]
         public async Task<IActionResult> ConfirmPresenceAppointmentAsync(Guid Id)
         {
             try

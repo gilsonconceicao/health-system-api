@@ -7,7 +7,7 @@ namespace HealthSystem.Web.Controller
     [Route("[Controller]")]
     public class DashboardController : ControllerBase
     {
-        private readonly DashboardRepository _dashboardRepository; 
+        private readonly DashboardRepository _dashboardRepository;
 
         public DashboardController(DashboardRepository dashboardRepository)
         {
@@ -18,7 +18,14 @@ namespace HealthSystem.Web.Controller
         [HttpGet]
         public async Task<IActionResult> getDataDashboard()
         {
-            return Ok(await _dashboardRepository.GetDashboardDataAppointment());
+            try
+            {
+                return Ok(await _dashboardRepository.GetDashboardDataAppointment());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

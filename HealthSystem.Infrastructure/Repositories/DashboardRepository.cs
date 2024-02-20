@@ -23,21 +23,25 @@ public class DashboardRepository : IDashboardRepository
     {
         var appointments = _patientsContext.Appointments;
 
-        var TotalsAppointmentsCancelled = _patientsContext.Appointments.Where(x => x.Status == AppointmentStatus.Cancelled); 
-        var TotalsAppointmentsConfirmParticipation = _patientsContext.Appointments.Where(x => x.Status == AppointmentStatus.confirmParticipation); 
+        var TotalsAppointmentsCancelled = _patientsContext.Appointments.Where(x => x.Status == AppointmentStatus.Cancelled);
+        var TotalsAppointmentsConfirmParticipation = _patientsContext.Appointments.Where(x => x.Status == AppointmentStatus.confirmParticipation);
 
-        List<FeedbackCommentReadModel> feedbackList = await appointments.Select(item => new FeedbackCommentReadModel{
-            AppointmentId = item.Id, 
-            Feedback = item.FeedbackPatient
-        }).ToListAsync();
+        List<FeedbackCommentReadModel> feedbackList = await appointments
+                                                            .Select(item => new FeedbackCommentReadModel
+                                                            {
+                                                                AppointmentId = item.Id,
+                                                                Feedback = item.FeedbackPatient
+                                                            }).Where(item => item.Feedback != null).ToListAsync();
+
 
         return new DashboardAppointmentReadModel()
         {
-            FeedbackPatients = feedbackList, 
+            FeedbackPatients = feedbackList,
             TotalsAppointments = appointments.Count(),
             TotalsAppointmentsCancelled = TotalsAppointmentsCancelled.Count(),
-            TotalsAppointmentsConfirmed = TotalsAppointmentsConfirmParticipation.Count()
-        }; 
+            TotalsAppointmentsConfirmed = TotalsAppointmentsConfirmParticipation.Count(), 
+            TotalPatients = _patientsContext.Patients.Count()
+        };
     }
 
 }

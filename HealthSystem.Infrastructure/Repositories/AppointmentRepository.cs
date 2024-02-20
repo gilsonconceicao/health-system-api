@@ -55,7 +55,7 @@ public class AppointmentRepository : IAppointmentRepository
 
     public async Task AddFeedbackByIdAsync(Appointment Appointment, string FeedbackMessage)
     {
-        if (Appointment.FeedbackPatient.Trim().Length > 0)
+        if (Appointment.FeedbackPatient != null && Appointment.FeedbackPatient.Trim().Length > 0)
         {
             Appointment.UpdatedAt = DateTime.UtcNow;
         }

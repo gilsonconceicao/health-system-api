@@ -133,9 +133,9 @@ namespace HealthSystem.Web.Controller
         /// <returns>Adiciona um feedback/comentário</returns>
         /// <response code="200">200 Retorno dos dados com sucesso</response>
         /// <response code="400">400 se houver falha na requisição</response>
-        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(FeedbackCreateModel))]
         [HttpPost("{Id}/Feedback")]
-        public async Task<IActionResult> AddFeedbackAsync(Guid Id, [FromBody] string FeedbackMessage)
+        public async Task<IActionResult> AddFeedbackAsync(Guid Id, [FromBody] FeedbackCreateModel model)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace HealthSystem.Web.Controller
                         details = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
                     });
                 }
-                await _AppointmentRepository.AddFeedbackByIdAsync(appointment, FeedbackMessage);
+                await _AppointmentRepository.AddFeedbackByIdAsync(appointment, model.FeedbackMessage);
                 return NoContent();
             }
             catch (Exception ex)

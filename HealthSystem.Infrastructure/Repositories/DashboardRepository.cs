@@ -30,7 +30,9 @@ public class DashboardRepository : IDashboardRepository
                                                             .Select(item => new FeedbackCommentReadModel
                                                             {
                                                                 AppointmentId = item.Id,
-                                                                Feedback = item.FeedbackPatient
+                                                                Feedback = item.FeedbackPatient, 
+                                                                CreatedAt = item.CreatedAt, 
+                                                                Name = item.Patient.Name
                                                             }).Where(item => item.Feedback != null).ToListAsync();
 
 

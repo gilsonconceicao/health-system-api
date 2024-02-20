@@ -7,5 +7,7 @@ namespace HealthSystem.Domain.Entities
     {
         public string Feedback { get; set; }
         public Guid AppointmentId { get; set; }
+        public DateTime CreatedAt {get; set;}
+        public string Name {get; set; }
     }
 }

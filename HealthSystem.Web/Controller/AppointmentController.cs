@@ -2,6 +2,8 @@ using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
 using HealthSystem.Application.DTOs.Enums;
 using HealthSystem.Application.DTOs.Read;
+using HealthSystem.Application.Services;
+using HealthSystem.Application.Validations;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
 using HealthSystem.Infrastructure.Repositories;
@@ -44,10 +46,11 @@ namespace HealthSystem.Web.Controller
 
                 if (patient == null)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Paciente não encontrado ou não existe",
-                        PatientId
+                        ErrorMessage = "Paciente não encontrado ou não existe",
+                        Identification = PatientId.ToString(),
+                        Resource = "Não foi possível agendar consulta"
                     });
                 }
 
@@ -55,10 +58,11 @@ namespace HealthSystem.Web.Controller
 
                 if (countAppointmentByPatientId.Count() >= 3)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Paciente já possui 3 consultas. Agendamento não pode ser realizado.",
-                        PatientId
+                        ErrorMessage = "Paciente já possui 3 consultas. Agendamento não pode ser realizado.",
+                        Identification = PatientId.ToString(),
+                        Resource = "Não foi possível agendar consulta"
                     });
                 }
 
@@ -69,10 +73,11 @@ namespace HealthSystem.Web.Controller
 
                 if (validateAppointmentDate.Count() > 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Já existe uma consulta para este horário",
-                        AppointmentDate = model.AppointmentDate
+                        ErrorMessage = "Já existe uma consulta para este horário",
+                        Identification = model.AppointmentDate.ToString(),
+                        Resource = "Não foi possível agendar consulta"
                     });
                 }
                 await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
@@ -101,19 +106,21 @@ namespace HealthSystem.Web.Controller
 
                 if (appointment == null)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Consulta não encontrada ou não existe",
-                        Id
+                        ErrorMessage = "Consulta não encontrada ou não existe",
+                        Identification = Id.ToString(),
+                        Resource = "Não foi possível cancelar consulta"
                     });
                 }
 
                 if (appointment.Status == AppointmentStatus.Cancelled)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Não é possível cancelar uma consulta que já se encontra cancelada",
-                        Id
+                        ErrorMessage = "Não é possível cancelar uma consulta que já se encontra cancelada",
+                        Identification = Id.ToString(),
+                        Resource = "Não foi possível cancelar consulta"
                     });
                 }
 
@@ -143,20 +150,21 @@ namespace HealthSystem.Web.Controller
 
                 if (appointment == null)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Consulta não encontrada ou não existe",
-                        Id
+                        ErrorMessage = "Consulta não encontrada ou não existe",
+                        Identification = Id.ToString(),
+                        Resource = "Não foi possível adicionar feedback"
                     });
                 }
 
                 if (appointment.Status != AppointmentStatus.Completed)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
-                        Id,
-                        details = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
+                        ErrorMessage = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
+                        Identification = Id.ToString(),
+                        Resource = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
                     });
                 }
                 await _AppointmentRepository.AddFeedbackByIdAsync(appointment, model.FeedbackMessage);
@@ -205,10 +213,11 @@ namespace HealthSystem.Web.Controller
 
                 if (appointment == null)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Consulta não encontrada ou não existe",
-                        Id
+                        ErrorMessage = "Consulta não encontrada ou não existe",
+                        Identification = Id.ToString(),
+                        Resource = "Não foi possível confirmar consulta"
                     });
                 }
                 else
@@ -217,11 +226,21 @@ namespace HealthSystem.Web.Controller
                     var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
                     if ((sameMonth && sameYear) && DateTime.Now.Day == appointment.AppointmentDate.Day)
                     {
-                        return BadRequest(new
+                        return BadRequest(new ValidationsHandleErrors
                         {
-                            message = "Não é possível confirmar presença no mesmo dia no qual foi agendado",
-                            Id,
-                            AppointmentDat = appointment.AppointmentDate
+                            ErrorMessage = "Não é possível confirmar presença no mesmo dia no qual foi agendado",
+                            Identification = appointment.AppointmentDate.ToString(),
+                            Resource = "Não foi possível confirmar consulta"
+                        });
+                    }
+
+                    if (appointment.Status == AppointmentStatus.confirmParticipation)
+                    {
+                        return BadRequest(new ValidationsHandleErrors
+                        {
+                            ErrorMessage = "Consulta já se encontra confirmada",
+                            Identification = appointment.Id.ToString(),
+                            Resource = "Não foi possível confirmar consulta"
                         });
                     }
                 }
@@ -250,10 +269,11 @@ namespace HealthSystem.Web.Controller
 
                 if (appointment == null)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Consulta não encontrada ou não existe",
-                        Id
+                        ErrorMessage = "Consulta não encontrada ou não existe",
+                        Identification = Id.ToString(),
+                        Resource = "Não foi possível remover consulta"
                     });
                 }
 
@@ -266,7 +286,7 @@ namespace HealthSystem.Web.Controller
             }
         }
 
-         /// <summary>
+        /// <summary>
         /// Finalizar consulta
         /// </summary>
         /// <returns>Marcar como concluída a consulta</returns>
@@ -282,22 +302,24 @@ namespace HealthSystem.Web.Controller
 
                 if (appointment == null)
                 {
-                    return BadRequest(new
+                    return BadRequest(new ValidationsHandleErrors
                     {
-                        message = "Consulta não encontrada ou não existe",
-                        Id
+                        ErrorMessage = "Consulta não encontrada ou não existe",
+                        Identification = Id.ToString(),
+                        Resource = "Não foi possível marcar como lida"
                     });
-                } else
+                }
+                else
                 {
                     var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
                     var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
-                    if ((sameMonth && sameYear) && appointment.AppointmentDate.Day +1 <= DateTime.Now.Day)
+                    if ((sameMonth && sameYear) && appointment.AppointmentDate.Day + 1 <= DateTime.Now.Day)
                     {
-                        return BadRequest(new
+                        return BadRequest(new ValidationsHandleErrors
                         {
-                            message = "Só pode confirmar uma consulta um dia após ser realizada",
-                            Id,
-                            AppointmentDat = appointment.AppointmentDate
+                            ErrorMessage = "Só pode concluir uma consulta um dia após ser realizada",
+                            Identification = Id.ToString(),
+                            Resource = $"Data da consulta definida {appointment.AppointmentDate}"
                         });
                     }
                 }

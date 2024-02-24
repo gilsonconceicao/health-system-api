@@ -16,12 +16,11 @@ namespace HealthSystem.Web.Controller
     public class AppointmentController : ControllerBase
     {
         private readonly GenericRepository<Appointment> _genericRepository;
-        private readonly AppointmentCreateModelValidator _validator;
-
+        private readonly AppointmentModelsValidator _validator;
         private readonly GenericRepository<Patient> _genericRepositoryPatient;
         private readonly AppointmentRepository _AppointmentRepository;
 
-        public AppointmentController(PatientsContext patientsContext, IMapper mapper, AppointmentCreateModelValidator validator)
+        public AppointmentController(PatientsContext patientsContext, IMapper mapper, AppointmentModelsValidator validator)
         {
             _genericRepository = new GenericRepository<Appointment>(patientsContext);
             _genericRepositoryPatient = new GenericRepository<Patient>(patientsContext);
@@ -44,51 +43,15 @@ namespace HealthSystem.Web.Controller
             {
                 Patient patient = await _genericRepositoryPatient.GetByIdAsync(PatientId);
                 var appointments = await _genericRepository.GetAll();
-                var listAppointment = appointments.Where(x => x.IsCanceled == false);
-                var errors = _validator.Validate(model, PatientId.ToString());
+                var listAppointmentNotCanceled = appointments.Where(x => x.IsCanceled == false).ToList();
 
-                if (errors != null)
+                var errors = _validator.ValidateCreateModel(PatientId, model, patient, listAppointmentNotCanceled);
+
+                if (errors!= null && errors.Count >= 0)
                 {
                     return BadRequest(errors);
                 }
-
-
-                if (patient == null)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Paciente não encontrado ou não existe",
-                        Identification = PatientId.ToString(),
-                        Resource = "Não foi possível agendar consulta"
-                    });
-                }
-
-                var countAppointmentByPatientId = listAppointment.Where((appointment) => appointment.PatientId == patient.Id);
-
-                if (countAppointmentByPatientId.Count() >= 3)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Paciente já possui 3 consultas. Agendamento não pode ser realizado.",
-                        Identification = PatientId.ToString(),
-                        Resource = "Não foi possível agendar consulta"
-                    });
-                }
-
-                var validateAppointmentDate = listAppointment.Where((x) =>
-                {
-                    return x.AppointmentDate.ToString() == model.AppointmentDate.ToString();
-                });
-
-                if (validateAppointmentDate.Count() > 0)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Já existe uma consulta para este horário",
-                        Identification = model.AppointmentDate.ToString(),
-                        Resource = "Não foi possível agendar consulta"
-                    });
-                }
+                
                 await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
             }
@@ -113,25 +76,25 @@ namespace HealthSystem.Web.Controller
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (appointment == null)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Consulta não encontrada ou não existe",
-                        Identification = Id.ToString(),
-                        Resource = "Não foi possível cancelar consulta"
-                    });
-                }
+                // if (appointment == null)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Consulta não encontrada ou não existe",
+                //         Identification = Id.ToString(),
+                //         Resource = "Não foi possível cancelar consulta"
+                //     });
+                // }
 
-                if (appointment.Status == AppointmentStatus.Cancelled)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Não é possível cancelar uma consulta que já se encontra cancelada",
-                        Identification = Id.ToString(),
-                        Resource = "Não foi possível cancelar consulta"
-                    });
-                }
+                // if (appointment.Status == AppointmentStatus.Cancelled)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Não é possível cancelar uma consulta que já se encontra cancelada",
+                //         Identification = Id.ToString(),
+                //         Resource = "Não foi possível cancelar consulta"
+                //     });
+                // }
 
 
                 await _AppointmentRepository.CancelAppointmentAsync(appointment);
@@ -157,25 +120,25 @@ namespace HealthSystem.Web.Controller
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (appointment == null)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Consulta não encontrada ou não existe",
-                        Identification = Id.ToString(),
-                        Resource = "Não foi possível adicionar feedback"
-                    });
-                }
+                // if (appointment == null)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Consulta não encontrada ou não existe",
+                //         Identification = Id.ToString(),
+                //         Resource = "Não foi possível adicionar feedback"
+                //     });
+                // }
 
-                if (appointment.Status != AppointmentStatus.Completed)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
-                        Identification = Id.ToString(),
-                        Resource = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
-                    });
-                }
+                // if (appointment.Status != AppointmentStatus.Completed)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
+                //         Identification = Id.ToString(),
+                //         Resource = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
+                //     });
+                // }
                 await _AppointmentRepository.AddFeedbackByIdAsync(appointment, model.FeedbackMessage);
                 return NoContent();
             }
@@ -220,39 +183,39 @@ namespace HealthSystem.Web.Controller
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (appointment == null)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Consulta não encontrada ou não existe",
-                        Identification = Id.ToString(),
-                        Resource = "Não foi possível confirmar consulta"
-                    });
-                }
-                else
-                {
-                    var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
-                    var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
-                    if ((sameMonth && sameYear) && DateTime.Now.Day == appointment.AppointmentDate.Day)
-                    {
-                        return BadRequest(new ValidationsHandleErrors
-                        {
-                            ErrorMessage = "Não é possível confirmar presença no mesmo dia no qual foi agendado",
-                            Identification = appointment.AppointmentDate.ToString(),
-                            Resource = "Não foi possível confirmar consulta"
-                        });
-                    }
+                // if (appointment == null)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Consulta não encontrada ou não existe",
+                //         Identification = Id.ToString(),
+                //         Resource = "Não foi possível confirmar consulta"
+                //     });
+                // }
+                // else
+                // {
+                //     var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
+                //     var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
+                //     if ((sameMonth && sameYear) && DateTime.Now.Day == appointment.AppointmentDate.Day)
+                //     {
+                //         return BadRequest(new ValidationsHandleErrors
+                //         {
+                //             ErrorMessage = "Não é possível confirmar presença no mesmo dia no qual foi agendado",
+                //             Identification = appointment.AppointmentDate.ToString(),
+                //             Resource = "Não foi possível confirmar consulta"
+                //         });
+                //     }
 
-                    if (appointment.Status == AppointmentStatus.confirmParticipation)
-                    {
-                        return BadRequest(new ValidationsHandleErrors
-                        {
-                            ErrorMessage = "Consulta já se encontra confirmada",
-                            Identification = appointment.Id.ToString(),
-                            Resource = "Não foi possível confirmar consulta"
-                        });
-                    }
-                }
+                //     if (appointment.Status == AppointmentStatus.confirmParticipation)
+                //     {
+                //         return BadRequest(new ValidationsHandleErrors
+                //         {
+                //             ErrorMessage = "Consulta já se encontra confirmada",
+                //             Identification = appointment.Id.ToString(),
+                //             Resource = "Não foi possível confirmar consulta"
+                //         });
+                //     }
+                // }
                 await _AppointmentRepository.ConfirmParticipationAsync(appointment);
                 return NoContent();
             }
@@ -276,15 +239,15 @@ namespace HealthSystem.Web.Controller
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (appointment == null)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Consulta não encontrada ou não existe",
-                        Identification = Id.ToString(),
-                        Resource = "Não foi possível remover consulta"
-                    });
-                }
+                // if (appointment == null)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Consulta não encontrada ou não existe",
+                //         Identification = Id.ToString(),
+                //         Resource = "Não foi possível remover consulta"
+                //     });
+                // }
 
                 await _genericRepository.Delete(appointment);
                 return NoContent();
@@ -309,29 +272,29 @@ namespace HealthSystem.Web.Controller
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
 
-                if (appointment == null)
-                {
-                    return BadRequest(new ValidationsHandleErrors
-                    {
-                        ErrorMessage = "Consulta não encontrada ou não existe",
-                        Identification = Id.ToString(),
-                        Resource = "Não foi possível marcar como lida"
-                    });
-                }
-                else
-                {
-                    var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
-                    var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
-                    if ((sameMonth && sameYear) && appointment.AppointmentDate.Day + 1 <= DateTime.Now.Day)
-                    {
-                        return BadRequest(new ValidationsHandleErrors
-                        {
-                            ErrorMessage = "Só pode concluir uma consulta um dia após ser realizada",
-                            Identification = Id.ToString(),
-                            Resource = $"Data da consulta definida {appointment.AppointmentDate}"
-                        });
-                    }
-                }
+                // if (appointment == null)
+                // {
+                //     return BadRequest(new ValidationsHandleErrors
+                //     {
+                //         ErrorMessage = "Consulta não encontrada ou não existe",
+                //         Identification = Id.ToString(),
+                //         Resource = "Não foi possível marcar como lida"
+                //     });
+                // }
+                // else
+                // {
+                //     var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
+                //     var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
+                //     if ((sameMonth && sameYear) && appointment.AppointmentDate.Day + 1 <= DateTime.Now.Day)
+                //     {
+                //         return BadRequest(new ValidationsHandleErrors
+                //         {
+                //             ErrorMessage = "Só pode concluir uma consulta um dia após ser realizada",
+                //             Identification = Id.ToString(),
+                //             Resource = $"Data da consulta definida {appointment.AppointmentDate}"
+                //         });
+                //     }
+                // }
                 await _AppointmentRepository.CompletedAppointmentAsync(appointment);
                 return NoContent();
             }

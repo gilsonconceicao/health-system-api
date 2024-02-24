@@ -45,7 +45,7 @@ namespace HealthSystem.Web
             services.AddScoped<DashboardRepository>();
 
             // Trasient`s
-            services.AddTransient<AppointmentCreateModelValidator>(); 
+            services.AddTransient<AppointmentModelsValidator>(); 
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>

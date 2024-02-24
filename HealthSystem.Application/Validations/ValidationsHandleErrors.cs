@@ -1,3 +1,5 @@
+using HealthSystem.Application.DTOs.Enums;
+
 namespace HealthSystem.Application.Validations;
 #nullable disable
 public class ValidationsHandleErrors

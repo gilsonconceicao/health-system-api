@@ -2,8 +2,8 @@ using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
 using HealthSystem.Application.DTOs.Enums;
 using HealthSystem.Application.DTOs.Read;
-using HealthSystem.Application.Services;
 using HealthSystem.Application.Validations;
+using HealthSystem.Application.Validators;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
 using HealthSystem.Infrastructure.Repositories;
@@ -16,15 +16,18 @@ namespace HealthSystem.Web.Controller
     public class AppointmentController : ControllerBase
     {
         private readonly GenericRepository<Appointment> _genericRepository;
+        private readonly AppointmentCreateModelValidator _validator;
+
         private readonly GenericRepository<Patient> _genericRepositoryPatient;
         private readonly AppointmentRepository _AppointmentRepository;
 
-        public AppointmentController(PatientsContext patientsContext, IMapper mapper)
+        public AppointmentController(PatientsContext patientsContext, IMapper mapper, AppointmentCreateModelValidator validator)
         {
             _genericRepository = new GenericRepository<Appointment>(patientsContext);
             _genericRepositoryPatient = new GenericRepository<Patient>(patientsContext);
 
             _AppointmentRepository = new AppointmentRepository(patientsContext, mapper);
+            _validator = validator;
         }
 
         /// <summary>
@@ -42,6 +45,12 @@ namespace HealthSystem.Web.Controller
                 Patient patient = await _genericRepositoryPatient.GetByIdAsync(PatientId);
                 var appointments = await _genericRepository.GetAll();
                 var listAppointment = appointments.Where(x => x.IsCanceled == false);
+                var errors = _validator.Validate(model, PatientId.ToString());
+
+                if (errors != null)
+                {
+                    return BadRequest(errors);
+                }
 
 
                 if (patient == null)

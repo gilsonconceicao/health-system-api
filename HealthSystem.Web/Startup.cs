@@ -1,4 +1,5 @@
 using System.Reflection;
+using HealthSystem.Application.Validators;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Domain.Interfaces;
 using HealthSystem.Infrastructure.Data.Contexts;
@@ -35,11 +36,16 @@ namespace HealthSystem.Web
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+            // Scoped`s
+
             services.AddScoped<IGenericRepository<Patient>, GenericRepository<Patient>>();
             services.AddScoped<IGenericRepository<Appointment>, GenericRepository<Appointment>>();
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<DashboardRepository>();
+
+            // Trasient`s
+            services.AddTransient<AppointmentCreateModelValidator>(); 
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>

@@ -1,8 +1,6 @@
 using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
-using HealthSystem.Application.DTOs.Enums;
 using HealthSystem.Application.DTOs.Read;
-using HealthSystem.Application.Validations;
 using HealthSystem.Application.Validators;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
@@ -16,11 +14,11 @@ namespace HealthSystem.Web.Controller
     public class AppointmentController : ControllerBase
     {
         private readonly GenericRepository<Appointment> _genericRepository;
-        private readonly AppointmentModelsValidator _validator;
+        private readonly AppointmentValidators _validator;
         private readonly GenericRepository<Patient> _genericRepositoryPatient;
         private readonly AppointmentRepository _AppointmentRepository;
 
-        public AppointmentController(PatientsContext patientsContext, IMapper mapper, AppointmentModelsValidator validator)
+        public AppointmentController(PatientsContext patientsContext, IMapper mapper, AppointmentValidators validator)
         {
             _genericRepository = new GenericRepository<Appointment>(patientsContext);
             _genericRepositoryPatient = new GenericRepository<Patient>(patientsContext);
@@ -47,11 +45,11 @@ namespace HealthSystem.Web.Controller
 
                 var errors = _validator.ValidateCreateModel(PatientId, model, patient, listAppointmentNotCanceled);
 
-                if (errors!= null && errors.Count >= 0)
+                if (errors != null && errors.Count >= 0)
                 {
                     return BadRequest(errors);
                 }
-                
+
                 await _AppointmentRepository.AddAppointmentAsync(model, PatientId);
                 return Ok();
             }
@@ -75,27 +73,12 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
+                var errors = _validator.ValidateCancelAppointment(appointment, Id);
 
-                // if (appointment == null)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Consulta não encontrada ou não existe",
-                //         Identification = Id.ToString(),
-                //         Resource = "Não foi possível cancelar consulta"
-                //     });
-                // }
-
-                // if (appointment.Status == AppointmentStatus.Cancelled)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Não é possível cancelar uma consulta que já se encontra cancelada",
-                //         Identification = Id.ToString(),
-                //         Resource = "Não foi possível cancelar consulta"
-                //     });
-                // }
-
+                if (errors.Count > 0)
+                {
+                    return BadRequest(errors);
+                }
 
                 await _AppointmentRepository.CancelAppointmentAsync(appointment);
                 return NoContent();
@@ -119,26 +102,13 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
+                var errors = _validator.ValidateCreateFeedback(appointment, Id);
 
-                // if (appointment == null)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Consulta não encontrada ou não existe",
-                //         Identification = Id.ToString(),
-                //         Resource = "Não foi possível adicionar feedback"
-                //     });
-                // }
+                if (errors.Count > 0)
+                {
+                    return BadRequest(errors);
+                }
 
-                // if (appointment.Status != AppointmentStatus.Completed)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
-                //         Identification = Id.ToString(),
-                //         Resource = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
-                //     });
-                // }
                 await _AppointmentRepository.AddFeedbackByIdAsync(appointment, model.FeedbackMessage);
                 return NoContent();
             }
@@ -182,40 +152,13 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
+                var errors = _validator.ValidateConfirmParticipation(appointment, Id);
 
-                // if (appointment == null)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Consulta não encontrada ou não existe",
-                //         Identification = Id.ToString(),
-                //         Resource = "Não foi possível confirmar consulta"
-                //     });
-                // }
-                // else
-                // {
-                //     var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
-                //     var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
-                //     if ((sameMonth && sameYear) && DateTime.Now.Day == appointment.AppointmentDate.Day)
-                //     {
-                //         return BadRequest(new ValidationsHandleErrors
-                //         {
-                //             ErrorMessage = "Não é possível confirmar presença no mesmo dia no qual foi agendado",
-                //             Identification = appointment.AppointmentDate.ToString(),
-                //             Resource = "Não foi possível confirmar consulta"
-                //         });
-                //     }
+                if (errors.Count > 0)
+                {
+                    return BadRequest(errors);
+                }
 
-                //     if (appointment.Status == AppointmentStatus.confirmParticipation)
-                //     {
-                //         return BadRequest(new ValidationsHandleErrors
-                //         {
-                //             ErrorMessage = "Consulta já se encontra confirmada",
-                //             Identification = appointment.Id.ToString(),
-                //             Resource = "Não foi possível confirmar consulta"
-                //         });
-                //     }
-                // }
                 await _AppointmentRepository.ConfirmParticipationAsync(appointment);
                 return NoContent();
             }
@@ -238,16 +181,11 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
-
-                // if (appointment == null)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Consulta não encontrada ou não existe",
-                //         Identification = Id.ToString(),
-                //         Resource = "Não foi possível remover consulta"
-                //     });
-                // }
+                var error = _validator.NotFoundAppointment(appointment, Id);
+                if (error != null)
+                {
+                    return BadRequest(error);
+                }
 
                 await _genericRepository.Delete(appointment);
                 return NoContent();
@@ -271,30 +209,13 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Appointment appointment = await _genericRepository.GetByIdAsync(Id);
+                var errors = _validator.ValidateFinishedAppointment(appointment, Id);
 
-                // if (appointment == null)
-                // {
-                //     return BadRequest(new ValidationsHandleErrors
-                //     {
-                //         ErrorMessage = "Consulta não encontrada ou não existe",
-                //         Identification = Id.ToString(),
-                //         Resource = "Não foi possível marcar como lida"
-                //     });
-                // }
-                // else
-                // {
-                //     var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
-                //     var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
-                //     if ((sameMonth && sameYear) && appointment.AppointmentDate.Day + 1 <= DateTime.Now.Day)
-                //     {
-                //         return BadRequest(new ValidationsHandleErrors
-                //         {
-                //             ErrorMessage = "Só pode concluir uma consulta um dia após ser realizada",
-                //             Identification = Id.ToString(),
-                //             Resource = $"Data da consulta definida {appointment.AppointmentDate}"
-                //         });
-                //     }
-                // }
+                if (errors.Count > 0)
+                {
+                    return BadRequest(errors);
+                }
+
                 await _AppointmentRepository.CompletedAppointmentAsync(appointment);
                 return NoContent();
             }

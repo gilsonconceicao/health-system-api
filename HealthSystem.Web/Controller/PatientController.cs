@@ -2,6 +2,7 @@ using AutoMapper;
 using HealthSystem.Application.DTOs.Create;
 using HealthSystem.Application.DTOs.Read;
 using HealthSystem.Application.DTOs.Update;
+using HealthSystem.Application.Validators;
 using HealthSystem.Domain.Entities;
 using HealthSystem.Infrastructure.Data.Contexts;
 using HealthSystem.Infrastructure.Repositories;
@@ -14,13 +15,15 @@ namespace HealthSystem.Web.Controller
     [Route("[Controller]")]
     public class PatientController : ControllerBase
     {
+        private readonly PatientValidators _validators;
         private readonly GenericRepository<Patient> _genericRepository;
         private readonly PatientRepository _patientRepository;
 
-        public PatientController(PatientsContext patientsContext, IMapper mapper)
+        public PatientController(PatientsContext patientsContext, IMapper mapper, PatientValidators patientValidators)
         {
             _genericRepository = new GenericRepository<Patient>(patientsContext);
             _patientRepository = new PatientRepository(patientsContext, mapper);
+            _validators = patientValidators;
         }
 
         /// <summary>
@@ -86,21 +89,19 @@ namespace HealthSystem.Web.Controller
         [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(PaginationList<PatientUpdateModel>))]
 
         [HttpPut("{Id}")]
-        public async Task<IActionResult> UpdatePatientById(Guid Id, [FromBody] PatientUpdateModel updatedData)
+        public async Task<IActionResult> UpdatePatientByIdAsync(Guid Id, [FromBody] PatientUpdateModel updatedData)
         {
             try
             {
                 Patient patient = await _genericRepository.GetByIdAsync(Id);
-                if (patient == null)
+                var error = _validators.NotFoundPatient(patient, Id);
+
+                if (error != null)
                 {
-                    return BadRequest(new
-                    {
-                        message = "Paciente não encontrado ou não existe",
-                        Id
-                    });
+                    return NotFound(error);
                 }
 
-                _patientRepository.UpdatePatientAsync(patient, updatedData);
+                await _patientRepository.UpdatePatientAsync(patient, updatedData);
                 return NoContent();
             }
             catch (Exception ex)
@@ -117,18 +118,16 @@ namespace HealthSystem.Web.Controller
         /// <response code="400">Returna 400 se houver falha na requisição</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("{Id}")]
-        public async Task<IActionResult> GetPatientById(Guid Id)
+        public async Task<IActionResult> GetPatientByIdAsync(Guid Id)
         {
             try
             {
                 Patient patient = await _genericRepository.GetByIdAsync(Id);
-                if (patient == null)
+                var error = _validators.NotFoundPatient(patient, Id);
+
+                if (error != null)
                 {
-                    return BadRequest(new
-                    {
-                        message = "Paciente não encontrado ou não existe",
-                        Id
-                    });
+                    return NotFound(error);
                 }
                 return Ok(patient);
             }
@@ -151,13 +150,11 @@ namespace HealthSystem.Web.Controller
             try
             {
                 Patient patient = await _genericRepository.GetByIdAsync(Id);
-                if (patient == null)
+                var error = _validators.NotFoundPatient(patient, Id);
+
+                if (error != null)
                 {
-                    return BadRequest(new
-                    {
-                        message = "Paciente não encontrado ou não existe",
-                        Id
-                    });
+                    return NotFound(error);
                 }
 
                 await _genericRepository.Delete(patient);

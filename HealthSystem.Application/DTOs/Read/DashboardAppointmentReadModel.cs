@@ -7,6 +7,7 @@ namespace HealthSystem.Domain.Entities
     {
         public int TotalsAppointments { get; set; }
         public int TotalsAppointmentsConfirmed { get; set; }
+        public int TotalsAppointmentsFinished { get; set; }
         public int TotalPatients { get; set; }
         public int TotalsAppointmentsCancelled { get; set; }
         public List<FeedbackCommentReadModel> FeedbackPatients { get; set; }

@@ -62,11 +62,11 @@ public class AppointmentValidators
         else
         {
             var countAppointmentByPatientId = appointments.Where((appointment) => appointment.PatientId == patient.Id).ToList();
-            if (countAppointmentByPatientId.Count() >= 3)
+            if (countAppointmentByPatientId.Count() >= 1)
             {
                 errors.Add(new ValidationsHandleErrors
                 {
-                    ErrorMessage = "Paciente já possui 3 consultas. Agendamento não pode ser realizado.",
+                    ErrorMessage = "Paciente já contém uma consulta em andamento. Agendamento não pode ser realizado.",
                     Identification = PatientId.ToString(),
                     Resource = ErrorType.EXPIRED_QUANTITY.GetDescription()
                 });
@@ -120,11 +120,11 @@ public class AppointmentValidators
 
         if (isAppointmentNotFound != null) errors.Add(isAppointmentNotFound);
 
-        if (appointment.Status != AppointmentStatus.Completed)
+        if (appointment.Status == AppointmentStatus.Cancelled || appointment.Status == AppointmentStatus.awaitConfirmParticipation)
         {
             errors.Add(new ValidationsHandleErrors
             {
-                ErrorMessage = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída",
+                ErrorMessage = "Não é possível adicionar um feedback em uma consulta que ainda não foi concluída ou de presença confirmada",
                 Identification = Id.ToString(),
                 Resource = $"CurrentStatus: {appointment.Status}, expected: {AppointmentStatus.Completed}"
             });
@@ -147,7 +147,7 @@ public class AppointmentValidators
         {
             var sameMonth = appointment.AppointmentDate.Month == DateTime.Now.Month;
             var sameYear = appointment.AppointmentDate.Year == DateTime.Now.Year;
-            if ((sameMonth && sameYear) && appointment.AppointmentDate.Day + 1 <= DateTime.Now.Day)
+            if ((sameMonth && sameYear) && appointment.AppointmentDate.Day + 1 >= DateTime.Now.Day)
             {
                 errors.Add(new ValidationsHandleErrors
                 {

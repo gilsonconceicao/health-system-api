@@ -45,7 +45,7 @@ namespace HealthSystem.Web.Controller
 
                 var errors = _validator.ValidateCreateModel(PatientId, model, patient, listAppointmentNotCanceled);
 
-                if (errors != null && errors.Count >= 0)
+                if (errors != null && errors.Count > 0)
                 {
                     return BadRequest(errors);
                 }
